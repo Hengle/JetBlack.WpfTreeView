@@ -46,6 +46,8 @@ private static IEnumerable<LoaderResult> EnumerateChildren(object parent)
 }
 ```
 
+Note that the files have no children, so the lazy loader parameter is null.
+
 The TreeView is bound to the root of the model, and the style is applied:
 
 ```xaml
