@@ -1,0 +1,12 @@
+﻿<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ice="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+
+  <SolidColorBrush x:Key="NormalForegroundBrush" Color="{x:Static SystemColors.ControlTextColor}" ice:Freeze="True" />
+  <SolidColorBrush x:Key="NormalBackgroundBrush" Color="{x:Static SystemColors.ControlColor}" ice:Freeze="True" />
+  <SolidColorBrush x:Key="HoverBackgroundBrush" Color="{x:Static SystemColors.HighlightColor}" ice:Freeze="True" />
+  <SolidColorBrush x:Key="SelectedBorderBrush" Color="{x:Static SystemColors.ActiveCaptionColor}" ice:Freeze="True" />
+  <SolidColorBrush x:Key="SelectedForegroundBrush" Color="{x:Static SystemColors.ActiveCaptionTextColor}" ice:Freeze="True" />  
+  
+</ResourceDictionary>
