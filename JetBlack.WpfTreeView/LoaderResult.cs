@@ -11,7 +11,7 @@ namespace JetBlack.WpfTreeView
             LazyLoader = lazyLoader;
         }
 
-        public object Child { get; set; }
-        public Func<object, IEnumerable<LoaderResult>> LazyLoader { get; set; }
+        public object Child { get; private set; }
+        public Func<object, IEnumerable<LoaderResult>> LazyLoader { get; private set; }
     }
 }
