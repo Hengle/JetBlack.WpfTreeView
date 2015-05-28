@@ -71,7 +71,7 @@ namespace JetBlack.WpfTreeView
         private void AddChildren(IEnumerable<LoaderResult> children)
         {
             foreach (var child in children.Select(x => _childFactory(this, x.Child, x.LazyLoader)))
-                _children.Add(child);
+                Add(child);
         }
 
         #region Children
