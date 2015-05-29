@@ -61,11 +61,6 @@ namespace JetBlack.WpfTreeView.ViewModels
             Items = new ObservableCollection<TreeViewItemViewModel>(items.Select(InitialiseItem));
         }
 
-        protected void Add(TreeViewItemViewModel item)
-        {
-            _items.Add(InitialiseItem(item));
-        }
-
         private TreeViewItemViewModel InitialiseItem(TreeViewItemViewModel item)
         {
             if (IsChecked.HasValue)
@@ -83,8 +78,6 @@ namespace JetBlack.WpfTreeView.ViewModels
         {
             Add(results.Select(x => _itemFactory(this, x.Value, x.LazyLoader)));
         }
-
-        #region Children
 
         public void GetItems(Action<ObservableCollection<TreeViewItemViewModel>> callback)
         {
@@ -119,8 +112,6 @@ namespace JetBlack.WpfTreeView.ViewModels
             return _items;
         }
 
-        #endregion
-
         public void Reset()
         {
             if (_lazyLoader != null)
@@ -151,13 +142,6 @@ namespace JetBlack.WpfTreeView.ViewModels
         public void UpdateExpandedChildren()
         {
             UpdateChildren(x => x._isExpanded, (x, y) => x._isExpanded = y, _isExpanded, x => x.OnPropertyChanged(() => IsExpanded));
-        }
-
-        public void ExpandParentNodes()
-        {
-            if (Parent == null) return;
-            Parent.IsExpanded = true;
-            Parent.ExpandParentNodes();
         }
 
         #endregion
@@ -289,7 +273,7 @@ namespace JetBlack.WpfTreeView.ViewModels
 
         #region Node state maintenance
 
-        protected void UpdateChildren(Func<TreeViewItemViewModel, bool?> getter, Action<TreeViewItemViewModel, bool?> setter, bool? value, Action<TreeViewItemViewModel> notify)
+        private void UpdateChildren(Func<TreeViewItemViewModel, bool?> getter, Action<TreeViewItemViewModel, bool?> setter, bool? value, Action<TreeViewItemViewModel> notify)
         {
             // If we haven't dot a definate selection state, or we haven't yet loaded the children, go no further.
             if (!value.HasValue || _items.Contains(DummyItem)) return;
@@ -306,7 +290,7 @@ namespace JetBlack.WpfTreeView.ViewModels
             }
         }
 
-        protected void UpdateChildren(Func<TreeViewItemViewModel, bool> getter, Action<TreeViewItemViewModel, bool> setter, bool value, Action<TreeViewItemViewModel> notify)
+        private void UpdateChildren(Func<TreeViewItemViewModel, bool> getter, Action<TreeViewItemViewModel, bool> setter, bool value, Action<TreeViewItemViewModel> notify)
         {
             // If we haven't dot a definate selection state, or we haven't yet loaded the children, go no further.
             if (_items.Contains(DummyItem)) return;
@@ -323,7 +307,7 @@ namespace JetBlack.WpfTreeView.ViewModels
             }
         }
 
-        protected void UpdateSiblingsAndParent(TreeViewItemViewModel child, Func<TreeViewItemViewModel, bool?> getter, Action<TreeViewItemViewModel, bool?> setter, bool? value, Action<TreeViewItemViewModel> notify, Action<TreeViewItemViewModel> notifySender)
+        private void UpdateSiblingsAndParent(TreeViewItemViewModel child, Func<TreeViewItemViewModel, bool?> getter, Action<TreeViewItemViewModel, bool?> setter, bool? value, Action<TreeViewItemViewModel> notify, Action<TreeViewItemViewModel> notifySender)
         {
             if (value != getter(child))
             {
