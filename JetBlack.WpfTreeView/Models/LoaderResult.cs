@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace JetBlack.WpfTreeView
+namespace JetBlack.WpfTreeView.Models
 {
     public class LoaderResult
     {

@@ -5,17 +5,17 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:io="clr-namespace:System.IO;assembly=mscorlib"
-  xmlns:viewModels="clr-namespace:JetBlack.WpfTreeView;assembly=JetBlack.WpfTreeView"
+  xmlns:viewModels="clr-namespace:JetBlack.WpfTreeView.ViewModels;assembly=JetBlack.WpfTreeView"
+  xmlns:localViewModels="clr-namespace:JetBlack.Examples.TreeViewTest.ViewModels"
   mc:Ignorable="d"
-  Title="MainWindow" Height="350" Width="525"
-  DataContext="{Binding RelativeSource={RelativeSource Self}}">
+  Title="MainWindow" Height="350" Width="525">
 
   <Window.Resources>
 
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/JetBlack.WpfTreeView;component/Colors.xaml" />
-        <ResourceDictionary Source="/JetBlack.WpfTreeView;component/TreeViewStyles.xaml" />
+        <ResourceDictionary Source="/JetBlack.WpfTreeView;component/Styles/Colors.xaml" />
+        <ResourceDictionary Source="/JetBlack.WpfTreeView;component/Styles/TreeViewStyles.xaml" />
       </ResourceDictionary.MergedDictionaries>
 
       <DataTemplate DataType="{x:Type io:DirectoryInfo}">
@@ -26,7 +26,7 @@
         <TextBlock Text="{Binding Path=Name}" ToolTip="{Binding Path=FullName}" />
       </DataTemplate>
 
-      <HierarchicalDataTemplate DataType="{x:Type viewModels:TreeViewModel}" ItemsSource="{Binding Children}">
+      <HierarchicalDataTemplate DataType="{x:Type viewModels:TreeViewItemViewModel}" ItemsSource="{Binding Children}">
         <StackPanel Orientation="Horizontal">
           <CheckBox Focusable="False" IsChecked="{Binding Path=IsChecked}" VerticalAlignment="Center" Margin="0,0,5,0" />
           <ContentPresenter Content="{Binding Path=Value}" />
@@ -37,13 +37,41 @@
 
   </Window.Resources>
 
+  <Window.DataContext>
+    <localViewModels:FileSystemTreeViewViewModel />
+  </Window.DataContext>
+  
   <Grid>
 
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+
     <TreeView
-        BorderThickness="0"
-        ItemContainerStyle="{StaticResource ExpandableTreeViewItemStyle}"
-        ItemsSource="{Binding Path=ViewModel.Root}"
-        VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Standard" />
+      Grid.Row="0"
+      Grid.Column="0"
+      Grid.ColumnSpan="2"
+      BorderThickness="0"
+      ItemContainerStyle="{StaticResource ExpandableTreeViewItemStyle}"
+      ItemsSource="{Binding Path=Items}"
+      VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Standard" />
+
+    <TextBox
+      Grid.Row="1"
+      Grid.Column="0"
+      Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}"
+      />
+
+    <Button
+      Grid.Row="1"
+      Grid.Column="1"
+      Content="X"
+      Command="{Binding Path=ClearSearchCommand}" />
 
   </Grid>
 

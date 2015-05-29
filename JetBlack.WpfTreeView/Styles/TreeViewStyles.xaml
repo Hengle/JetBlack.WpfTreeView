@@ -3,10 +3,11 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:local="clr-namespace:JetBlack.WpfTreeView"
+  xmlns:viewModels="clr-namespace:JetBlack.WpfTreeView.ViewModels"
+  xmlns:converters="clr-namespace:JetBlack.WpfTreeView.Converters"
   mc:Ignorable="d">
 
-  <local:NullableBoolConverter x:Key="NullableBoolToVisibilityConverter" True="{x:Static Visibility.Visible}" False="{x:Static Visibility.Collapsed}" Null="{x:Static Visibility.Visible}" />
+  <converters:NullableBoolConverter x:Key="NullableBoolToVisibilityConverter" True="{x:Static Visibility.Visible}" False="{x:Static Visibility.Collapsed}" Null="{x:Static Visibility.Visible}" />
 
   <PathGeometry x:Key="TreeViewArrow">
     <PathGeometry.Figures>
@@ -87,7 +88,7 @@
 
   <Style TargetType="{x:Type TreeView}" BasedOn="{StaticResource TreeViewStyle}" />
 
-  <Style x:Key="ExpandableTreeViewItemStyle" TargetType="{x:Type TreeViewItem}" d:DataContext="{d:DesignInstance Type=local:TreeViewModel, IsDesignTimeCreatable=False}">
+  <Style x:Key="ExpandableTreeViewItemStyle" TargetType="{x:Type TreeViewItem}" d:DataContext="{d:DesignInstance Type=viewModels:TreeViewItemViewModel, IsDesignTimeCreatable=False}">
     <Setter Property="Background" Value="{DynamicResource NormalBackgroundBrush}" />
     <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, FallbackValue=Stretch}" />
     <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, FallbackValue=Stretch}" />
@@ -120,7 +121,7 @@
             </Grid.RowDefinitions>
 
             <ToggleButton
-              x:Name="Expander" 
+              x:Name="Expander"
               Grid.Row="0" Grid.Column="0"
               Style="{StaticResource ExpandCollapseToggleStyle}" ClickMode="Press"
               IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -206,102 +207,6 @@
             </Trigger>
 
             <Trigger Property="UIElement.IsEnabled" Value="false">
-              <Setter Property="Control.Foreground" Value="{DynamicResource NormalForegroundBrush}" />
-            </Trigger>
-
-          </ControlTemplate.Triggers>
-
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
-
-  <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
-    <Setter Property="Background" Value="{DynamicResource NormalBackgroundBrush}" />
-    <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, FallbackValue=Stretch}" />
-    <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, FallbackValue=Stretch}" />
-    <Setter Property="Foreground" Value="{DynamicResource NormalForegroundBrush}" />
-    <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}" />
-    <Setter Property="BorderThickness" Value="0" />
-
-    <Setter Property="FontFamily" Value="Segoe UI" />
-    <Setter Property="Padding" Value="2" />
-    <Setter Property="Margin" Value="0" />
-
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="TreeViewItem">
-          <Grid>
-
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition MinWidth="19" Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto" />
-              <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <ToggleButton
-              x:Name="Expander"
-              Grid.Row="0" Grid.Column="0"
-              Style="{StaticResource ExpandCollapseToggleStyle}"
-              ClickMode="Press"
-              IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" />
-
-            <Border
-              Name="Bd"
-              Grid.Row="0" Grid.Column="1"
-              Background="{TemplateBinding Control.Background}"
-              BorderBrush="{TemplateBinding Control.BorderBrush}"
-              BorderThickness="{TemplateBinding Control.BorderThickness}"
-              SnapsToDevicePixels="true">
-
-              <ContentPresenter x:Name="PART_Header"
-                                Margin="{TemplateBinding Control.Padding}"
-                                ContentSource="Header"
-                                HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
-                                SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}">
-
-                <ContentPresenter.Resources>
-
-                  <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Foreground}" />
-                  </Style>
-
-                </ContentPresenter.Resources>
-
-              </ContentPresenter>
-            </Border>
-
-            <ItemsPresenter
-              x:Name="ItemsHost"
-              Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" />
-
-          </Grid>
-
-          <ControlTemplate.Triggers>
-
-            <Trigger Property="TreeViewItem.IsExpanded" Value="False">
-              <Setter TargetName="ItemsHost" Property="UIElement.Visibility" Value="Collapsed" />
-            </Trigger>
-
-            <Trigger Property="ItemsControl.HasItems" Value="False">
-              <Setter TargetName="Expander" Property="UIElement.Visibility" Value="Hidden" />
-            </Trigger>
-
-            <Trigger SourceName="Bd" Property="UIElement.IsMouseOver" Value="True">
-              <Setter TargetName="Bd" Property="Border.Background" Value="{DynamicResource HoverBackgroundBrush}" />
-            </Trigger>
-
-            <Trigger Property="TreeViewItem.IsSelected" Value="True">
-              <Setter TargetName="Bd" Property="Border.Background" Value="{DynamicResource SelectedBorderBrush}" />
-              <Setter Property="Control.Foreground" Value="{DynamicResource SelectedForegroundBrush}" />
-            </Trigger>
-
-            <Trigger Property="UIElement.IsEnabled" Value="False">
               <Setter Property="Control.Foreground" Value="{DynamicResource NormalForegroundBrush}" />
             </Trigger>
 
