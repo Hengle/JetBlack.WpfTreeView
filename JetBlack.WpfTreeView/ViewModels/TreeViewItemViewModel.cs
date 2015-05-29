@@ -184,10 +184,10 @@ namespace JetBlack.WpfTreeView.ViewModels
 
                 _isChecked = value;
 
-                UpdateSelectedChildren();
+                UpdateCheckedChildren();
 
                 if (Parent != null)
-                    Parent.UpdateSelectedSiblingsAndParent(this, this);
+                    Parent.UpdateCheckedSiblingsAndParent(this, this);
                 else
                     RaiseSelectedChanged(this);
 
@@ -204,12 +204,12 @@ namespace JetBlack.WpfTreeView.ViewModels
                 handler(value, EventArgs.Empty);
         }
 
-        private void UpdateSelectedChildren()
+        private void UpdateCheckedChildren()
         {
             UpdateChildren(x => x._isChecked, (x, y) => x._isChecked = y, _isChecked, x => x.OnPropertyChanged(() => IsChecked));
         }
 
-        private void UpdateSelectedSiblingsAndParent(TreeViewItemViewModel sender, TreeViewItemViewModel child)
+        private void UpdateCheckedSiblingsAndParent(TreeViewItemViewModel sender, TreeViewItemViewModel child)
         {
             UpdateSiblingsAndParent(child, x => x._isChecked, (x, y) => x._isChecked = y, _isChecked, x => x.OnPropertyChanged(() => IsChecked), x => x.RaiseSelectedChanged(sender));
         }
