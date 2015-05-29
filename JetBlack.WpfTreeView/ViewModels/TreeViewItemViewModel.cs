@@ -10,15 +10,15 @@ using Microsoft.Practices.Prism.Mvvm;
 namespace JetBlack.WpfTreeView.ViewModels
 {
     [DebuggerDisplay("Value = {Value}, IsChecked = {IsChecked}, Parent = {Parent}, Children = {_children}")]
-    public abstract class TreeViewItemViewModel : BindableBase
+    public class TreeViewItemViewModel : BindableBase
     {
-        protected static readonly TreeViewItemViewModel DummyChild = new DummyTreeViewItemViewModel();
+        private static readonly TreeViewItemViewModel DummyChild = new DummyTreeViewItemViewModel();
 
         private readonly Func<object, IEnumerable<LoaderResult>> _lazyLoader;
         private ObservableCollection<TreeViewItemViewModel> _children;
         private readonly Func<TreeViewItemViewModel, object, Func<object, IEnumerable<LoaderResult>>, TreeViewItemViewModel> _childFactory;
 
-        protected TreeViewItemViewModel(TreeViewItemViewModel parent, object value, Func<object, IEnumerable<LoaderResult>> lazyLoader, Func<TreeViewItemViewModel, object, Func<object, IEnumerable<LoaderResult>>, TreeViewItemViewModel> childFactory)
+        public TreeViewItemViewModel(TreeViewItemViewModel parent, object value, Func<object, IEnumerable<LoaderResult>> lazyLoader, Func<TreeViewItemViewModel, object, Func<object, IEnumerable<LoaderResult>>, TreeViewItemViewModel> childFactory)
         {
             Parent = parent;
             Value = value;
