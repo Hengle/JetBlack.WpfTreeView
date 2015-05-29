@@ -189,19 +189,19 @@ namespace JetBlack.WpfTreeView.ViewModels
                 if (Parent != null)
                     Parent.UpdateCheckedSiblingsAndParent(this, this);
                 else
-                    RaiseSelectedChanged(this);
+                    RaiseCheckedChanged(this);
 
                 OnPropertyChanged(() => IsChecked);
             }
         }
 
-        public event EventHandler<EventArgs> CheckedChanged;
+        public event EventHandler<CheckedChangedEventArgs> CheckedChanged;
 
-        private void RaiseSelectedChanged(TreeViewItemViewModel value)
+        private void RaiseCheckedChanged(TreeViewItemViewModel item)
         {
             var handler = CheckedChanged;
             if (handler != null)
-                handler(value, EventArgs.Empty);
+                handler(item, new CheckedChangedEventArgs(item.Value, item.IsChecked));
         }
 
         private void UpdateCheckedChildren()
@@ -211,7 +211,7 @@ namespace JetBlack.WpfTreeView.ViewModels
 
         private void UpdateCheckedSiblingsAndParent(TreeViewItemViewModel sender, TreeViewItemViewModel child)
         {
-            UpdateSiblingsAndParent(child, x => x._isChecked, (x, y) => x._isChecked = y, _isChecked, x => x.OnPropertyChanged(() => IsChecked), x => x.RaiseSelectedChanged(sender));
+            UpdateSiblingsAndParent(child, x => x._isChecked, (x, y) => x._isChecked = y, _isChecked, x => x.OnPropertyChanged(() => IsChecked), x => x.RaiseCheckedChanged(sender));
         }
 
         #endregion
