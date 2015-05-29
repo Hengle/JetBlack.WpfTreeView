@@ -12,22 +12,22 @@ namespace JetBlack.WpfTreeView.ViewModels
     [DebuggerDisplay("Value = {Value}, IsChecked = {IsChecked}, Parent = {Parent}, Children = {_children}")]
     public class TreeViewItemViewModel : BindableBase
     {
-        private static readonly TreeViewItemViewModel DummyChild = new DummyTreeViewItemViewModel();
+        private static readonly TreeViewItemViewModel DummyItem = new DummyTreeViewItemViewModel();
 
         private readonly Func<object, IEnumerable<LoaderResult>> _lazyLoader;
-        private ObservableCollection<TreeViewItemViewModel> _children;
-        private readonly Func<TreeViewItemViewModel, object, Func<object, IEnumerable<LoaderResult>>, TreeViewItemViewModel> _childFactory;
+        private ObservableCollection<TreeViewItemViewModel> _items;
+        private readonly Func<TreeViewItemViewModel, object, Func<object, IEnumerable<LoaderResult>>, TreeViewItemViewModel> _itemFactory;
 
-        public TreeViewItemViewModel(TreeViewItemViewModel parent, object value, Func<object, IEnumerable<LoaderResult>> lazyLoader, Func<TreeViewItemViewModel, object, Func<object, IEnumerable<LoaderResult>>, TreeViewItemViewModel> childFactory)
+        public TreeViewItemViewModel(TreeViewItemViewModel parent, object value, Func<object, IEnumerable<LoaderResult>> lazyLoader, Func<TreeViewItemViewModel, object, Func<object, IEnumerable<LoaderResult>>, TreeViewItemViewModel> itemFactory)
         {
             Parent = parent;
             Value = value;
             _lazyLoader = lazyLoader;
-            _childFactory = childFactory;
+            _itemFactory = itemFactory;
 
-            _children = new ObservableCollection<TreeViewItemViewModel>();
+            _items = new ObservableCollection<TreeViewItemViewModel>();
             if (lazyLoader != null)
-                _children.Add(DummyChild);
+                _items.Add(DummyItem);
         }
 
         public TreeViewItemViewModel Parent { get; private set; }
@@ -40,80 +40,83 @@ namespace JetBlack.WpfTreeView.ViewModels
             set { _value = value; OnPropertyChanged(() => Value); }
         }
 
-        public ObservableCollection<TreeViewItemViewModel> Children
+        public ObservableCollection<TreeViewItemViewModel> Items
         {
             get
             {
-                if (_children.Contains(DummyChild) && _isExpanded)
-                    GetChildren(children => OnPropertyChanged(() => Children));
+                if (_items.Contains(DummyItem) && _isExpanded)
+                    GetItems(_ => OnPropertyChanged(() => Items));
 
-                return _children;
+                return _items;
             }
             private set
             {
-                _children = value;
-                OnPropertyChanged(() => Children);
+                _items = value;
+                OnPropertyChanged(() => Items);
             }
         }
 
-        private void Add(IEnumerable<TreeViewItemViewModel> children)
+        private void Add(IEnumerable<TreeViewItemViewModel> items)
         {
-            Children = new ObservableCollection<TreeViewItemViewModel>(children.Select(InitialiseChild));
+            Items = new ObservableCollection<TreeViewItemViewModel>(items.Select(InitialiseItem));
         }
 
-        protected void Add(TreeViewItemViewModel child)
+        protected void Add(TreeViewItemViewModel item)
         {
-            _children.Add(InitialiseChild(child));
+            _items.Add(InitialiseItem(item));
         }
 
-        private TreeViewItemViewModel InitialiseChild(TreeViewItemViewModel child)
+        private TreeViewItemViewModel InitialiseItem(TreeViewItemViewModel item)
         {
             if (IsChecked.HasValue)
-                child._isChecked = IsChecked;
+                item._isChecked = IsChecked;
+
             if (IsVisible.HasValue)
-                child._isVisible = IsVisible;
-            child.Parent = this;
-            return child;
+                item._isVisible = IsVisible;
+
+            item.Parent = this;
+
+            return item;
         }
 
-        private void AddChildren(IEnumerable<LoaderResult> children)
+        private void Add(IEnumerable<LoaderResult> results)
         {
-            Add(children.Select(x => _childFactory(this, x.Child, x.LazyLoader)));
+            Add(results.Select(x => _itemFactory(this, x.Value, x.LazyLoader)));
         }
 
         #region Children
 
-        public void GetChildren(Action<ObservableCollection<TreeViewItemViewModel>> callback)
+        public void GetItems(Action<ObservableCollection<TreeViewItemViewModel>> callback)
         {
-            if (!_children.Contains(DummyChild))
-                callback(_children);
+            if (!_items.Contains(DummyItem))
+                callback(_items);
             else
             {
-                _children.Remove(DummyChild);
+                _items.Remove(DummyItem);
 
                 IsLoading = true;
 
                 Task.Factory.StartNew(() => _lazyLoader(Value))
                     .ContinueWith(x =>
                     {
-                        AddChildren(x.Result);
+                        Add(x.Result);
                         IsLoading = false;
-                        callback(_children);
+                        callback(_items);
                     }, TaskScheduler.FromCurrentSynchronizationContext());
             }
         }
 
-        public ObservableCollection<TreeViewItemViewModel> GetChildren()
+        public ObservableCollection<TreeViewItemViewModel> GetItems()
         {
-            if (_children.Contains(DummyChild))
+            if (_items.Contains(DummyItem))
             {
-                _children.Remove(DummyChild);
+                _items.Remove(DummyItem);
                 IsLoading = true;
-                AddChildren(_lazyLoader(Value));
+                Add(_lazyLoader(Value));
                 IsLoading = false;
             }
 
-            return _children;
+            return _items;
         }
 
         #endregion
@@ -122,11 +125,11 @@ namespace JetBlack.WpfTreeView.ViewModels
         {
             if (_lazyLoader != null)
             {
-                _children.Clear();
-                _children.Add(DummyChild);
+                _items.Clear();
+                _items.Add(DummyItem);
             }
 
-            OnPropertyChanged(() => Children);
+            OnPropertyChanged(() => Items);
         }
 
         #region IsExpanded
@@ -139,8 +142,8 @@ namespace JetBlack.WpfTreeView.ViewModels
             set
             {
                 _isExpanded = value;
-                if (_children.Contains(DummyChild))
-                    OnPropertyChanged(() => Children);
+                if (_items.Contains(DummyItem))
+                    OnPropertyChanged(() => Items);
                 OnPropertyChanged(() => IsExpanded);
             }
         }
@@ -289,10 +292,10 @@ namespace JetBlack.WpfTreeView.ViewModels
         protected void UpdateChildren(Func<TreeViewItemViewModel, bool?> getter, Action<TreeViewItemViewModel, bool?> setter, bool? value, Action<TreeViewItemViewModel> notify)
         {
             // If we haven't dot a definate selection state, or we haven't yet loaded the children, go no further.
-            if (!value.HasValue || _children.Contains(DummyChild)) return;
+            if (!value.HasValue || _items.Contains(DummyItem)) return;
 
             // Find children with a different selection state from ourself.
-            foreach (var child in _children.Where(child => getter(child) != value))
+            foreach (var child in _items.Where(child => getter(child) != value))
             {
                 // Set the child state and raise the event.
                 setter(child, value);
@@ -306,10 +309,10 @@ namespace JetBlack.WpfTreeView.ViewModels
         protected void UpdateChildren(Func<TreeViewItemViewModel, bool> getter, Action<TreeViewItemViewModel, bool> setter, bool value, Action<TreeViewItemViewModel> notify)
         {
             // If we haven't dot a definate selection state, or we haven't yet loaded the children, go no further.
-            if (_children.Contains(DummyChild)) return;
+            if (_items.Contains(DummyItem)) return;
 
             // Find children with a different selection state from ourself.
-            foreach (var child in _children.Where(child => getter(child) != value))
+            foreach (var child in _items.Where(child => getter(child) != value))
             {
                 // Set the child state and raise the event.
                 setter(child, value);
@@ -327,7 +330,7 @@ namespace JetBlack.WpfTreeView.ViewModels
                 // If the child has a value and all children share the same value then that is our state, otherwise
                 // the state is null.
                 var state =
-                    (getter(child).HasValue && _children.All(x => getter(x) == getter(child)))
+                    (getter(child).HasValue && _items.All(x => getter(x) == getter(child)))
                         ? getter(child)
                         : null;
 

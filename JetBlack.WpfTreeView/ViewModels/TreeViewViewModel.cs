@@ -33,7 +33,7 @@ namespace JetBlack.WpfTreeView.ViewModels
 
         public IEnumerable<TreeViewItemViewModel> Items
         {
-            get { return _treeViewItemViewModel.GetChildren(); }
+            get { return _treeViewItemViewModel.GetItems(); }
         }
 
         public string SearchText
@@ -82,7 +82,7 @@ namespace JetBlack.WpfTreeView.ViewModels
             {
                 var item = path.Dequeue();
 
-                node.GetChildren(children =>
+                node.GetItems(children =>
                 {
                     if (token.IsCancellationRequested)
                         return;
@@ -113,7 +113,7 @@ namespace JetBlack.WpfTreeView.ViewModels
 
         private void ResetTree()
         {
-            foreach (var child in _treeViewItemViewModel.Children)
+            foreach (var child in _treeViewItemViewModel.Items)
             {
                 child.IsExpanded = false;
                 child.UpdateExpandedChildren();
