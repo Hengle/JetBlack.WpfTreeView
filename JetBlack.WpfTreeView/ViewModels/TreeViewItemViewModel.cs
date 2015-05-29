@@ -32,7 +32,13 @@ namespace JetBlack.WpfTreeView.ViewModels
 
         public TreeViewItemViewModel Parent { get; private set; }
 
-        public object Value { get; private set; }
+        private object _value;
+
+        public object Value
+        {
+            get { return _value; }
+            set { _value = value; OnPropertyChanged(() => Value); }
+        }
 
         public ObservableCollection<TreeViewItemViewModel> Children
         {
